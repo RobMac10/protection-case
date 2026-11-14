@@ -89,10 +89,12 @@
     <h2>Three witnesses</h2>
     <p>The same three questions for each. Each has a real portrait, or a real 1928 photograph. No likeness has been invented.</p>
 
-    <article class="witness" id="witness-phillip">
+    <article class="witness witness-grid" id="witness-phillip">
       <figure>
-        <img src="assets/portraits/phillip.jpg" alt="A real 1786 portrait of Arthur Phillip, by Francis Wheatley.">
-        <figcaption>Arthur Phillip, 1786. Portrait by Francis Wheatley. Mitchell Library collection; Wikimedia Commons. Public domain.</figcaption>
+        <button type="button" class="portrait-zoom" aria-label="Enlarge: A real 1786 portrait of Arthur Phillip, by Francis Wheatley.">
+          <img src="assets/portraits/phillip.jpg" alt="A real 1786 portrait of Arthur Phillip, by Francis Wheatley.">
+        </button>
+        <figcaption>Arthur Phillip, 1786. Portrait by Francis Wheatley. Mitchell Library collection; Wikimedia Commons. Public domain. Tap to enlarge.</figcaption>
       </figure>
       <div>
         <h3>Arthur Phillip</h3>
@@ -113,10 +115,12 @@
       </div>
     </article>
 
-    <article class="witness" id="witness-neville">
+    <article class="witness witness-grid" id="witness-neville">
       <figure>
-        <img src="assets/portraits/neville.jpg" alt="A real 1936 newspaper photograph of A. O. Neville.">
-        <figcaption>A. O. Neville, 1936. The Daily News, Perth, 31 July 1936. Public domain.</figcaption>
+        <button type="button" class="portrait-zoom" aria-label="Enlarge: A real 1936 newspaper photograph of A. O. Neville.">
+          <img src="assets/portraits/neville.jpg" alt="A real 1936 newspaper photograph of A. O. Neville.">
+        </button>
+        <figcaption>A. O. Neville, 1936. The Daily News, Perth, 31 July 1936. Public domain. Tap to enlarge.</figcaption>
       </figure>
       <div>
         <h3>A. O. Neville</h3>
@@ -137,10 +141,12 @@
       </div>
     </article>
 
-    <article class="witness" id="witness-harris">
+    <article class="witness witness-grid" id="witness-harris">
       <figure>
-        <img src="assets/portraits/harris-deputation-1928.jpg" alt="A real 1928 photograph of the Aboriginal deputation to Premier Collier. William Harris is in the front row.">
-        <figcaption>The Aboriginal deputation to Premier Collier, Perth, 1928. Freshwater Bay Museum, 07.99. Public domain. Front, left to right: Edward Harris and William Harris.</figcaption>
+        <button type="button" class="portrait-zoom" aria-label="Enlarge: A real 1928 photograph of the Aboriginal deputation to Premier Collier. William Harris is in the front row.">
+          <img src="assets/portraits/harris-deputation-1928.jpg" alt="A real 1928 photograph of the Aboriginal deputation to Premier Collier. William Harris is in the front row.">
+        </button>
+        <figcaption>The Aboriginal deputation to Premier Collier, Perth, 1928. Freshwater Bay Museum, 07.99. Public domain. Front, left to right: Edward Harris and William Harris. Tap to enlarge.</figcaption>
       </figure>
       <div>
         <h3>William Harris</h3>
@@ -278,8 +284,18 @@
 
 <footer class="wrap">
   <p>A sample case from <cite>Reopen the Record: Australian Histories</cite>. Case 3, Year 10. Draft, pending consultation. The QR code uses a split-shield emblem at the centre.</p>
-  <p><img src="assets/app-qr-shield.png" width="160" height="160" alt="QR code for this case file."></p>
+  <p><img class="qr" src="assets/app-qr-shield.png" width="160" height="160" alt="QR code for this case file."></p>
 </footer>
+
+<div id="portrait-lightbox" class="lightbox" hidden role="dialog" aria-modal="true" aria-labelledby="portrait-lightbox-title">
+  <p id="portrait-lightbox-title" class="visually-hidden">Magnified image</p>
+  <button type="button" class="lightbox-close" aria-label="Close the magnified image">&times;</button>
+  <div class="lightbox-stage">
+    <img src="" alt="">
+  </div>
+  <p class="lightbox-hint">Pinch or scroll to zoom. Tap outside, or press Escape, to close.</p>
+</div>
+
 <script src="assets/app.js"></script>
 </body>
 </html>

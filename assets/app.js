@@ -130,23 +130,60 @@
     var img = stage ? stage.querySelector('img') : null;
     var title = document.getElementById('portrait-lightbox-title');
     var lastFocus = null;
+    var scale = 1, tx = 0, ty = 0;
+    var pointers = {};
+    var pinch0 = null;
+    var lastTap = 0;
+
     function isOpen() { return !lb.hasAttribute('hidden'); }
+    function apply() {
+      if (!img) return;
+      img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+    }
+    function resetView() {
+      scale = 1; tx = 0; ty = 0;
+      apply();
+    }
+    function clamp() {
+      if (scale < 1) scale = 1;
+      if (scale > 5) scale = 5;
+      if (scale === 1) { tx = 0; ty = 0; }
+    }
+    function zoomAt(cx, cy, next) {
+      var rect = stage.getBoundingClientRect();
+      var x = cx - rect.left;
+      var y = cy - rect.top;
+      var prev = scale;
+      scale = next;
+      clamp();
+      // Keep the point under the fingers/cursor steady.
+      tx = x - (x - tx) * (scale / prev);
+      ty = y - (y - ty) * (scale / prev);
+      if (scale === 1) { tx = 0; ty = 0; }
+      apply();
+    }
     function open(src, alt) {
       if (!img) return;
       lastFocus = document.activeElement;
+      img.onload = function () { resetView(); };
       img.src = src;
       img.alt = alt || '';
       if (title) title.textContent = alt || 'Magnified image';
+      resetView();
       lb.removeAttribute('hidden');
       document.body.classList.add('lightbox-open');
       if (closeBtn) closeBtn.focus();
     }
     function close() {
+      if (!isOpen()) return;
       lb.setAttribute('hidden', '');
       document.body.classList.remove('lightbox-open');
-      if (img) img.src = '';
+      pointers = {};
+      pinch0 = null;
+      if (img) { img.src = ''; img.alt = ''; img.onload = null; }
       if (lastFocus && lastFocus.focus) lastFocus.focus();
     }
+
     Array.prototype.forEach.call(document.querySelectorAll('.portrait-zoom'), function (btn) {
       btn.addEventListener('click', function (e) {
         e.preventDefault();
@@ -155,9 +192,82 @@
       });
     });
     if (closeBtn) closeBtn.addEventListener('click', function (e) { e.stopPropagation(); close(); });
-    lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+    lb.addEventListener('click', function (e) {
+      if (e.target === lb || e.target === stage) close();
+    });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && isOpen()) close();
+      if (e.key === 'Escape' && isOpen()) {
+        e.preventDefault();
+        close();
+      }
+    });
+
+    if (!stage || !img) return;
+
+    stage.addEventListener('wheel', function (e) {
+      if (!isOpen()) return;
+      e.preventDefault();
+      var factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+      zoomAt(e.clientX, e.clientY, scale * factor);
+    }, { passive: false });
+
+    stage.addEventListener('dblclick', function (e) {
+      if (!isOpen()) return;
+      e.preventDefault();
+      if (scale > 1.05) { scale = 1; tx = 0; ty = 0; apply(); }
+      else zoomAt(e.clientX, e.clientY, 2.2);
+    });
+
+    stage.addEventListener('pointerdown', function (e) {
+      if (!isOpen() || e.button) return;
+      // A quick second tap on a touch device toggles zoom (dblclick is flaky).
+      if (e.pointerType === 'touch') {
+        var now = Date.now();
+        if (now - lastTap < 300 && Object.keys(pointers).length === 0) {
+          lastTap = 0;
+          e.preventDefault();
+          if (scale > 1.05) { scale = 1; tx = 0; ty = 0; apply(); }
+          else zoomAt(e.clientX, e.clientY, 2.2);
+          return;
+        }
+        lastTap = now;
+      }
+      pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      try { stage.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+    stage.addEventListener('pointermove', function (e) {
+      if (!isOpen() || !pointers[e.pointerId]) return;
+      var ids = Object.keys(pointers);
+      if (ids.length === 2) {
+        var a = pointers[ids[0]], b = pointers[ids[1]];
+        var other = (String(e.pointerId) === ids[0]) ? b : a;
+        var dist = Math.hypot(e.clientX - other.x, e.clientY - other.y);
+        var midX = (e.clientX + other.x) / 2;
+        var midY = (e.clientY + other.y) / 2;
+        if (pinch0 && pinch0.dist > 0) {
+          zoomAt(midX, midY, pinch0.scale * (dist / pinch0.dist));
+        } else {
+          pinch0 = { dist: dist, scale: scale };
+        }
+        pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      } else if (ids.length === 1 && scale > 1.01) {
+        var prev = pointers[e.pointerId];
+        tx += e.clientX - prev.x;
+        ty += e.clientY - prev.y;
+        pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+        apply();
+      } else {
+        pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+      }
+    });
+    function endPointer(e) {
+      delete pointers[e.pointerId];
+      if (Object.keys(pointers).length < 2) pinch0 = null;
+    }
+    stage.addEventListener('pointerup', endPointer);
+    stage.addEventListener('pointercancel', endPointer);
+    stage.addEventListener('pointerleave', function (e) {
+      if (pointers[e.pointerId]) endPointer(e);
     });
   })();
 })();
