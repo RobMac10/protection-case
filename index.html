@@ -7,6 +7,8 @@
 <meta name="description" content="Did “protection” ever mean protection? The 1787 instructions, the Aborigines Act 1905 (WA), and A. O. Neville.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/image-fit.css">
+  <link rel="stylesheet" href="assets/place-time.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to the case</a>
@@ -167,7 +169,21 @@
       </div>
     </article>
     <p class="next"><button type="button" class="btn" data-goto="finding">Write my finding</button></p>
-  </section>
+  
+
+    <section class="place-time" data-place-time="protection" aria-label="Place and time">
+      <h3>Place and time</h3>
+      <p class="pt-lead"></p>
+      <div class="pt-mapcard"></div>
+      <p class="pt-maplbl" aria-live="polite"></p>
+      <div class="pt-ctl">
+        <button type="button" class="pt-play">▶ Play</button>
+        <input type="range" min="0" max="1" value="0">
+      </div>
+      <ol class="pt-tl" aria-label="Timeline of places and dates in this file"></ol>
+    </section>
+
+</section>
 
   <section id="finding" role="tabpanel" aria-labelledby="tab-finding" class="panel" hidden>
     <div class="tools">
@@ -297,5 +313,7 @@
 </div>
 
 <script src="assets/app.js"></script>
+<script src="assets/place-time.js"></script>
+
 </body>
 </html>
